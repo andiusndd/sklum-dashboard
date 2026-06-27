@@ -1959,16 +1959,6 @@ async function initDashboard() {
         sheetNameEl.textContent = metadata.spreadsheet;
     }
 
-    // Process Data
-    const summary = {
-      total: tasks.length,
-      hoanThanh: 0,
-      dangThucHien: 0,
-      sanSangCheck: 0,
-      chuaBatDau: 0,
-      feedback: 0
-    };
-
     const normalizedTasks = tasks.map((t, idx) => {
       const task = {
         name: t.model_id || t.sku || t.collection || t.task_name || 'Untitled',
@@ -1979,36 +1969,34 @@ async function initDashboard() {
         date: (t.col_r || t.ngay_accepted || t.ngay_gui_l1 || t.due_date || 'TBD').trim()
       };
 
-      // Map Status to English for Display
-      const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-      
-      if (s.includes('hoan thanh')) {
-          summary.hoanThanh++;
-          task.status = 'Completed';
-      } else if (s.includes('dang thuc hien')) {
-          summary.dangThucHien++;
-          task.status = 'In Progress';
-      } else if (s.includes('san sang check')) {
-          summary.sanSangCheck++;
-          task.status = 'Ready for Review';
-      } else if (s.includes('chua bat dau')) {
-          summary.chuaBatDau++;
-          task.status = 'Not Started';
-      }
-
-      // Map Column Q (Feedback) - Checking for any value that might indicate feedback
-      // if column name contains feedback, we use it directly.
-      // Searching all keys for 'feedback' or 'phan_hoi' if we haven't found it yet.
-      let hasFeedback = false;
-      const f = task.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-      if (f === 'feedback') {
-        hasFeedback = true;
-      }
-
-      if (hasFeedback) summary.feedback++;
-      
+      const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[????]/g, 'd');
+      if (s.includes('hoan thanh')) task.status = 'Completed';
+      else if (s.includes('dang thuc hien')) task.status = 'In Progress';
+      else if (s.includes('san sang check')) task.status = 'Ready for Review';
+      else if (s.includes('chua bat dau')) task.status = 'Not Started';
       return task;
     });
+
+    const summary = responseData.summary || {
+      total: normalizedTasks.length,
+      hoanThanh: 0,
+      dangThucHien: 0,
+      sanSangCheck: 0,
+      chuaBatDau: 0,
+      feedback: 0
+    };
+
+    if (!responseData.summary) {
+      normalizedTasks.forEach(task => {
+        const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[????]/g, 'd');
+        const f = task.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[????]/g, 'd');
+        if (s.includes('completed')) summary.hoanThanh++;
+        else if (s.includes('in progress')) summary.dangThucHien++;
+        else if (s.includes('ready for review')) summary.sanSangCheck++;
+        else if (s.includes('not started')) summary.chuaBatDau++;
+        if (f === 'feedback') summary.feedback++;
+      });
+    }
 
     // Update Metrics
     const metricValues = document.querySelectorAll('.metric-value');
@@ -2136,19 +2124,18 @@ async function initDashboard() {
     // Update Bar Chart (Tasks by Modeler - Column I)
     const barChart = document.querySelector('.bar-chart');
     if(barChart) {
-        // Count tasks per Modeler
-        const modelerCounts = {};
-        normalizedTasks.forEach(t => {
-            const m = (t.assignee || '').trim();
-            if (m && m !== 'Unassigned') {
-                modelerCounts[m] = (modelerCounts[m] || 0) + 1;
-            }
-        });
-
-        // Convert to array and sort by count
-        const sortedModelers = Object.entries(modelerCounts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 12); // Show top 12 to fill the wide 3:2 layout
+        const sortedModelers = (responseData.chartData?.modelerCounts || (() => {
+            const modelerCounts = {};
+            normalizedTasks.forEach(t => {
+                const m = (t.assignee || '').trim();
+                if (m && m !== 'Unassigned') {
+                    modelerCounts[m] = (modelerCounts[m] || 0) + 1;
+                }
+            });
+            return Object.entries(modelerCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 12);
+        })());
 
         const maxCount = Math.max(...sortedModelers.map(m => m[1]), 1);
         
@@ -2168,7 +2155,6 @@ async function initDashboard() {
             barChart.appendChild(row);
         });
     }
-
     // --- APPLY FILTERS ---
     const searchInput = document.getElementById('table-search');
     const statusFilter = document.getElementById('status-filter');
