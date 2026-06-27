@@ -2256,6 +2256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsModal = document.getElementById('settings-modal');
     const closeModal = document.querySelector('.close-modal');
     const copyEmailBtn = document.getElementById('copy-email-btn');
+    const storageStatus = document.getElementById('storage-status');
 
     if (!heartBtn) {
         console.warn('❌ Heart button not found! Check ID "heart-settings-btn"');
@@ -2333,6 +2334,22 @@ document.addEventListener('DOMContentLoaded', () => {
             copyEmailBtn.textContent = originalText;
             copyEmailBtn.style.background = '';
         }, 2000);
+    }
+
+    // Storage status
+    if (storageStatus) {
+        fetch('/api/config-status')
+            .then(r => r.json())
+            .then(info => {
+                storageStatus.textContent = info.kvConfigured
+                    ? 'Backend storage: Vercel KV enabled'
+                    : 'Backend storage: fallback mode (KV not configured)';
+                storageStatus.style.color = info.kvConfigured ? '#51cf66' : '#f59f00';
+            })
+            .catch(() => {
+                storageStatus.textContent = 'Backend storage: status unavailable';
+                storageStatus.style.color = '#f59f00';
+            });
     }
 
     // Save Config Function
