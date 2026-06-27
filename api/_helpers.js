@@ -13,15 +13,17 @@ function hasKv() {
 
 async function kvRequest(method, key, value) {
     if (!hasKv()) return null;
-    const url = `${process.env.KV_REST_API_URL}/${encodeURIComponent(key)}`;
+    const url = method === 'GET'
+        ? `${process.env.KV_REST_API_URL}/get/${encodeURIComponent(key)}`
+        : `${process.env.KV_REST_API_URL}/set/${encodeURIComponent(key)}`;
     const headers = {
         Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain',
     };
     const res = await fetch(url, {
         method,
         headers,
-        body: method === 'GET' ? undefined : JSON.stringify(value),
+        body: method === 'GET' ? undefined : String(value ?? ''),
     });
     if (!res.ok) {
         const text = await res.text();
@@ -212,7 +214,7 @@ async function fetchSheetData(overrideSheetId) {
 
 async function saveSheetId(sheetId) {
     if (hasKv()) {
-        await kvRequest('POST', KV_KEY, { value: sheetId });
+        await kvRequest('POST', KV_KEY, sheetId);
         return { stored: 'kv' };
     }
     fs.writeFileSync(storagePath, JSON.stringify({ SHEET_ID: sheetId, updatedAt: new Date().toISOString() }, null, 2));
