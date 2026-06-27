@@ -1925,10 +1925,8 @@ window.addEventListener('scroll', () => {
 // --- NEW: Google Sheets Data Integration ---
 async function initDashboard() {
   try {
-    const savedSheetId = localStorage.getItem('sklum_sheet_id') || '';
     const urlSheetId = new URLSearchParams(window.location.search).get('sheetId') || '';
-    const sheetId = urlSheetId || savedSheetId || '';
-    const apiUrl = sheetId ? `/api/data?sheetId=${encodeURIComponent(sheetId)}&t=${Date.now()}` : `/api/data?t=${Date.now()}`;
+    const apiUrl = urlSheetId ? `/api/data?sheetId=${encodeURIComponent(urlSheetId)}&t=${Date.now()}` : `/api/data?t=${Date.now()}`;
     const res = await fetch(apiUrl);
     const responseData = await res.json();
     console.log('Fetched API Response:', responseData);
@@ -1942,7 +1940,7 @@ async function initDashboard() {
     const lastUpdatedEl = document.querySelector('.last-updated span:last-child');
     const sheetNameEl = document.getElementById('header-sheet-name');
     const sheetInput = document.getElementById('sheet-id-input');
-    const currentSheetId = new URLSearchParams(window.location.search).get('sheetId') || localStorage.getItem('sklum_sheet_id');
+    const currentSheetId = new URLSearchParams(window.location.search).get('sheetId');
     
     // Auto-fill Sheet ID from URL, localStorage, or server metadata
     if (sheetInput) {

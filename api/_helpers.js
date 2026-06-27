@@ -5,16 +5,50 @@ const path = require('path');
 const storagePath = path.join(process.cwd(), 'localstorage.json');
 const DEFAULT_SHEET_ID = '1vR6ZhTMotNPxzuReclqE7DUBF9EsjiofVjQqEDIurEc';
 const DEFAULT_SHEET_TITLE = 'Project Timeline';
+const KV_KEY = 'sklum_sheet_id';
 
-function getSheetId(overrideSheetId) {
-    if (overrideSheetId) return overrideSheetId;
+function hasKv() {
+    return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+async function kvRequest(method, key, value) {
+    if (!hasKv()) return null;
+    const url = `${process.env.KV_REST_API_URL}/${encodeURIComponent(key)}`;
+    const headers = {
+        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+        'Content-Type': 'application/json',
+    };
+    const res = await fetch(url, {
+        method,
+        headers,
+        body: method === 'GET' ? undefined : JSON.stringify(value),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`KV ${method} failed: ${res.status} ${text}`);
+    }
+    return res.json();
+}
+
+async function getStoredSheetId() {
+    try {
+        const result = await kvRequest('GET', KV_KEY);
+        if (result && typeof result.result === 'string' && result.result.trim()) {
+            return result.result.trim();
+        }
+    } catch (e) {}
     if (fs.existsSync(storagePath)) {
         try {
             const data = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
             if (data.SHEET_ID) return data.SHEET_ID;
         } catch (e) {}
     }
-    return process.env.SHEET_ID || DEFAULT_SHEET_ID;
+    return null;
+}
+
+async function getSheetId(overrideSheetId) {
+    if (overrideSheetId) return overrideSheetId;
+    return (await getStoredSheetId()) || process.env.SHEET_ID || DEFAULT_SHEET_ID;
 }
 
 function getCredentials() {
@@ -137,7 +171,7 @@ async function fetchSheetData(overrideSheetId) {
         scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
-    const sheetId = getSheetId(overrideSheetId);
+    const sheetId = await getSheetId(overrideSheetId);
 
     const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
     const sheetName = chooseSheet(meta);
@@ -176,6 +210,15 @@ async function fetchSheetData(overrideSheetId) {
     return { data, metadata, summary, chartData };
 }
 
+async function saveSheetId(sheetId) {
+    if (hasKv()) {
+        await kvRequest('POST', KV_KEY, { value: sheetId });
+        return { stored: 'kv' };
+    }
+    fs.writeFileSync(storagePath, JSON.stringify({ SHEET_ID: sheetId, updatedAt: new Date().toISOString() }, null, 2));
+    return { stored: 'file' };
+}
+
 module.exports = {
     DEFAULT_SHEET_ID,
     DEFAULT_SHEET_TITLE,
@@ -188,4 +231,6 @@ module.exports = {
     buildModelerChart,
     buildTaskView,
     fetchSheetData,
+    saveSheetId,
+    hasKv,
 };
