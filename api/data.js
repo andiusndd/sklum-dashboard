@@ -6,7 +6,8 @@ module.exports = async (req, res) => {
     res.setHeader('Expires', '0');
 
     try {
-        const payload = await fetchSheetData();
+        const overrideSheetId = req.query?.sheetId;
+        const payload = await fetchSheetData(overrideSheetId);
         return res.status(200).json(payload);
     } catch (error) {
         return res.status(500).json({ error: error.message });

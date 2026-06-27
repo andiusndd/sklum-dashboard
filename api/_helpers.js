@@ -6,7 +6,8 @@ const storagePath = path.join(process.cwd(), 'localstorage.json');
 const DEFAULT_SHEET_ID = '1vR6ZhTMotNPxzuReclqE7DUBF9EsjiofVjQqEDIurEc';
 const DEFAULT_SHEET_TITLE = 'Project Timeline';
 
-function getSheetId() {
+function getSheetId(overrideSheetId) {
+    if (overrideSheetId) return overrideSheetId;
     if (fs.existsSync(storagePath)) {
         try {
             const data = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
@@ -127,7 +128,7 @@ function buildTaskView(rows) {
     });
 }
 
-async function fetchSheetData() {
+async function fetchSheetData(overrideSheetId) {
     const credentials = getCredentials();
     if (!credentials) throw new Error('Missing GOOGLE_CREDENTIALS');
 
@@ -136,7 +137,7 @@ async function fetchSheetData() {
         scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
-    const sheetId = getSheetId();
+    const sheetId = getSheetId(overrideSheetId);
 
     const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
     const sheetName = chooseSheet(meta);
