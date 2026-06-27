@@ -1,31 +1,41 @@
 # SKLUM Standalone Dashboard
 
-Dashboard thuần (Pure HTML/JS) kết nối Google Sheets API thông qua Node.js proxy.
+Dashboard HTML/JS thuần, chạy qua Node.js proxy để đọc dữ liệu từ Google Sheets.
 
-## 🚀 Khởi động nhanh
+## Chạy local
 
-1. **Cài đặt thư viện**:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+npm start
+```
 
-2. **Chạy Server**:
-   ```bash
-   npm start
-   ```
-   Sau đó truy cập: [http://localhost:3000](http://localhost:3000)
+Mở:
 
-## 📁 Cấu trúc thư mục
+```text
+http://localhost:3000
+```
 
-- `index.html`: Giao diện Dashboard (HTML/CSS/JS thuần).
-- `server.js`: Node.js server xử lý lấy dữ liệu từ Google Sheets API.
-- `.env.local`: Chứa thông tin cấu hình và thông tin Service Account của Google.
+## Cấu trúc chính
 
-## 🛠 Cách hoạt động
+- `index.html`: giao diện dashboard.
+- `server.js`: server local, nạp `.env.local` rồi mount API từ `api/server.js`.
+- `api/server.js`: endpoint `/api/data` và `/api/save-config`.
+- `.env.local`: cấu hình thật của dự án, không nên commit.
 
-1. Khi truy cập trang web, `index.html` sẽ gửi yêu cầu lấy dữ liệu tới `/api/data`.
-2. `server.js` đọc cấu hình từ `.env.local`, sử dụng thư viện `googleapis` để lấy dữ liệu từ Google Sheet.
-3. Dữ liệu được trả về dưới dạng JSON và `index.html` sẽ cập nhật giao diện (Bảng, Biểu đồ, Metrics).
+## Biến môi trường cần có
 
----
-*Ghi chú: Project này đã được chuyển đổi từ Next.js sang "Code thuần" để tăng tốc độ cài đặt và dễ dàng chỉnh sửa trực tiếp.*
+Tạo `.env.local` từ `.env.example` và điền:
+
+- `SHEET_ID`: Google Sheet ID.
+- `GOOGLE_CREDENTIALS`: JSON service account.
+- `ADMIN_PASSWORD`: mật khẩu cho phần quản trị nếu dùng.
+
+## Lưu ý vận hành
+
+- Dashboard tự refresh mỗi 60 giây.
+- Khi tab bị ẩn, auto-refresh sẽ tạm dừng để tiết kiệm tài nguyên.
+- Nếu đổi Sheet ID trong modal settings, giá trị sẽ được lưu vào `localstorage.json`.
+
+## Ghi chú
+
+Repo này đã được chuyển từ Next.js sang standalone HTML/JS + Node.js để dễ chỉnh sửa và triển khai nhanh hơn.

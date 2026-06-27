@@ -1,0 +1,2723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKLUM Dashboard - Black & White</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/apng" href="icons8-heart.apng">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Pure Black & White Grayscale System */
+      --black: #000000;
+      --gray-900: #1a1a1a;
+      --gray-800: #2a2a2a;
+      --gray-700: #3a3a3a;
+      --gray-600: #666666;
+      --gray-500: #808080;
+      --gray-400: #999999;
+      --gray-300: #b3b3b3;
+      --gray-200: #cccccc;
+      --gray-100: #e6e6e6;
+      --gray-50: #f5f5f5;
+      --white: #ffffff;
+      
+      /* Glass Effects */
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      
+      /* Typography - Apple System Font Stack for Vietnamese support */
+      --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Icons", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    /* Hide main scrollbar */
+    html::-webkit-scrollbar {
+      display: none;
+    }
+    html {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    /* Custom Grayscale Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Firefox Scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    /* Disable scroll snap on mobile for free scrolling */
+    @media (max-width: 768px) {
+      html {
+        scroll-snap-type: none;
+      }
+      
+      .section {
+        scroll-snap-align: none;
+      }
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--gray-900);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background */
+    .tech-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      background: var(--gray-900);
+      background-size: cover;
+      background-position: center;
+      transition: background-image 1s ease-in-out;
+    }
+
+    #bg-video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    #bg-video.loaded {
+      opacity: 1;
+    }
+
+    .tech-background::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0);
+      transition: background 0.4s ease;
+      z-index: 1; /* Overlay on video */
+      pointer-events: none;
+    }
+
+    /* Darkened state */
+    .tech-background.darkened::before {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 2; /* Ensure grid is on top */
+    }
+
+    /* Content Layer */
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* Header */
+    header {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 12px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    header.header-hidden {
+      padding: 10px 0;
+      background: rgba(20, 20, 20, 0.7); /* Darker glass for better contrast in shrunk state */
+      backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    /* Simplified Hidden State Logic: Keep elements aligned with container */
+    header.header-hidden .logo-text h1 {
+      font-size: 18px;
+      display: inline;
+      line-height: 1;
+    }
+
+    header.header-hidden .logo-text p {
+      display: inline;
+      font-size: 18px;
+      font-weight: 300;
+      opacity: 0.8;
+    }
+
+    header.header-hidden .last-updated {
+      font-size: 13px;
+      color: var(--white);
+    }
+
+    header.header-hidden .live-dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    header.header-hidden .toggle-text {
+      display: inline;
+      color: var(--white);
+    }
+
+    header.header-hidden .dark-toggle img {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Ultra-wide screens: Push info to corners when scrolling */
+    @media (min-width: 1600px) {
+      header.header-hidden {
+        background: transparent;
+        backdrop-filter: none;
+        border-bottom: none;
+        box-shadow: none;
+        pointer-events: none;
+      }
+
+      header.header-hidden .header-content {
+        max-width: none;
+        width: 100%;
+        padding: 0;
+      }
+
+      header.header-hidden .logo {
+        position: fixed;
+        left: 48px;
+        top: 36px;
+        z-index: 101;
+        pointer-events: auto;
+        padding: 0;
+        background: none;
+        backdrop-filter: none;
+        border: none;
+      }
+
+      /* Align sheet name under logo */
+      header.header-hidden .logo-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+      }
+
+      header.header-hidden #header-sheet-name {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        font-size: 13px !important;
+        opacity: 0.6;
+        margin-top: 2px !important;
+        display: block !important;
+      }
+
+      header.header-hidden .header-actions {
+        position: fixed;
+        display: flex; /* Ensure flex behavior */
+        right: 48px;
+        top: 36px;
+        z-index: 101;
+        pointer-events: auto;
+        padding: 0; /* No padding as requested */
+        background: none; /* No background as requested */
+        backdrop-filter: none;
+        border: none; /* No border as requested */
+        flex-direction: column;
+        align-items: flex-end; /* Align all items to the right */
+        gap: 12px; /* Slight increase for better vertical spacing */
+      }
+      
+      header.header-hidden .media-group {
+          display: flex;
+          flex-direction: row; /* Horizontal row for media controller */
+          align-items: center;
+          gap: 16px;
+      }
+
+      header.header-hidden .media-toggle,
+      header.header-hidden .nav-btn,
+      header.header-hidden .dark-toggle {
+          margin: 0 !important;
+          width: auto; /* Reset width for horizontal group */
+          justify-content: flex-end; /* Align content to right */
+          border-radius: 8px; /* Reset circular radius */
+          padding: 8px 12px;
+          transition: background 0.3s ease, opacity 0.3s ease;
+      }
+
+      header.header-hidden .media-toggle:hover,
+      header.header-hidden .dark-toggle:hover {
+          background: none; /* Removed background */
+          opacity: 0.7;
+      }
+
+      header.header-hidden .nav-btn:hover {
+          background: none; /* Hidden background on hover for nav buttons */
+          opacity: 0.6; /* Slight dim instead of background box */
+      }
+      
+      header.header-hidden .toggle-text {
+        display: inline-block; /* Force show text in this mode */
+        margin-left: 8px;
+        font-size: 10px;
+        letter-spacing: 1px;
+        font-weight: 600;
+         color: var(--white);
+      }
+
+      header.header-hidden .logo-text h1 {
+        font-size: 20px;
+        display: block;
+      }
+
+      header.header-hidden .logo-text p {
+        display: block;
+        font-size: 10px;
+      }
+
+      header.header-hidden .last-updated {
+        display: flex; /* Bring back updated time for wide screens */
+      }
+    }
+
+    /* Fixed alignment for standard screens */
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+
+    /* Sheet Name Layout */
+    #header-sheet-name {
+      margin: 0;
+      font-size: 16px;
+      opacity: 0.8;
+      font-weight: 400;
+      border-left: 1px solid rgba(255,255,255,0.2);
+      padding-left: 12px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--white);
+      white-space: nowrap;
+    }
+
+    /* Mobile Header Optimization */
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 0;
+      }
+
+      .header-content {
+        padding: 0 16px;
+        gap: 12px;
+      }
+
+      /* Logo - Compact */
+      .logo {
+        gap: 8px;
+      }
+
+      .logo-text {
+        gap: 8px;
+      }
+
+      .logo-text h1 {
+        font-size: 16px;
+        letter-spacing: -0.3px;
+      }
+
+      .logo-text h1 img {
+        width: 16px !important;
+        height: 16px !important;
+        margin-left: 4px !important;
+        top: 1px !important;
+      }
+
+      /* Hide sheet name timestamp on mobile */
+      #header-sheet-name {
+        font-size: 10px;
+        padding-left: 8px;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Header Actions - Compact */
+      .header-actions {
+        gap: 8px;
+      }
+
+      .media-group {
+        gap: 6px;
+      }
+
+      /* Smaller icons on mobile */
+      .dark-toggle img,
+      .media-toggle img {
+        width: 20px !important;
+        height: 20px !important;
+      }
+
+      .nav-btn img {
+        width: 18px !important;
+        height: 18px !important;
+      }
+
+      /* Hide toggle text on mobile */
+      .toggle-text {
+        display: none !important;
+      }
+
+      /* Hide prev/next buttons on mobile */
+      .prev-media,
+      .next-media {
+        display: none;
+      }
+
+      /* Compact header when scrolled */
+      header.header-hidden {
+        padding: 4px 0;
+      }
+
+      header.header-hidden .header-content {
+        padding: 0 20px !important; /* Align with cards below */
+        width: 100% !important;
+        justify-content: space-between !important;
+        max-width: none !important;
+      }
+
+      header.header-hidden .logo,
+      header.header-hidden .logo-text {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        gap: 6px !important; /* Tighter gap */
+      }
+
+      header.header-hidden .logo-text h1 {
+        font-size: 13px; /* Smaller logo text */
+      }
+
+      header.header-hidden #header-sheet-name {
+        font-size: 8px; /* Smaller sheet title */
+        max-width: 90px;
+        padding-left: 8px;
+        border-left: 1px solid rgba(255,255,255,0.15);
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 480px) {
+      .header-content {
+        padding: 0 20px;
+      }
+
+      .logo-text h1 {
+        font-size: 14px;
+      }
+
+      #header-sheet-name {
+        max-width: 80px;
+        font-size: 11px;
+      }
+
+      /* Hide prev/next buttons on very small screens */
+      .prev-media,
+      .next-media {
+        display: none;
+      }
+
+      .media-group {
+        gap: 8px;
+      }
+
+      .dark-toggle img,
+      .media-toggle img {
+        width: 18px !important;
+        height: 18px !important;
+      }
+    }
+
+    header.header-hidden .logo-icon {
+      display: none;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      display: none;
+    }
+
+    .logo-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text p {
+      display: none;
+    }
+
+
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .header-actions, .media-group {
+      display: flex;
+      align-items: center;
+      gap: clamp(12px, 2vw, 24px);
+    }
+    
+    .last-updated {
+      display: none !important;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--white);
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+
+    .dark-toggle, .media-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .dark-toggle:hover, .media-toggle:hover {
+      opacity: 0.7;
+      background: none; /* Removed background */
+    }
+    
+    .nav-btn:hover {
+      opacity: 0.7;
+      background: none; /* Removed background as requested */
+    }
+    
+    .nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: opacity 0.3s ease;
+      border-radius: 50%;
+    }
+    
+    .nav-btn:hover {
+      background: none;
+    }
+
+    /* Main Content */
+    main {
+      padding: 48px 0;
+    }
+
+    .section {
+      margin-bottom: 50px;
+      scroll-snap-align: center;
+      scroll-margin-top: 100px; /* Space for sticky header */
+    }
+
+    /* Metric Cards */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 columns for 6 metrics (2 rows) */
+      gap: 24px;
+    }
+
+    .metric-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+
+    .metric-card:hover {
+      border-color: var(--white);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+
+    .metric-icon {
+      font-size: clamp(24px, 3vw, 32px);
+      margin-bottom: clamp(10px, 1.5vh, 16px);
+      transition: transform 0.3s ease;
+    }
+
+    .metric-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .metric-label {
+      font-size: clamp(11px, 1.2vw, 13px);
+      color: var(--gray-300);
+      font-weight: 400;
+      margin-bottom: clamp(6px, 1vh, 12px);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .metric-value {
+      font-size: clamp(32px, 4.5vw, 48px);
+      font-weight: 800;
+      margin-bottom: clamp(6px, 1vh, 12px);
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .metric-trend {
+      font-size: 13px;
+      color: var(--gray-400);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 300;
+    }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* 5 columns total */
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .chart-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--glass-shadow);
+      transition: border-color 0.3s ease, transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chart-card:hover {
+      border-color: var(--white);
+    }
+
+    #donut-card {
+      grid-column: span 2; /* 2/5 columns */
+      min-height: 480px;
+    }
+
+    #bar-card {
+      grid-column: span 3; /* 3/5 columns */
+      min-height: 480px;
+    }
+
+    #donut-card .legend {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 24px;
+      width: 100%;
+      padding-left: 10px;
+    }
+
+    #donut-card .chart-content {
+      justify-content: center;
+      gap: 32px;
+      padding: 0;
+    }
+
+    #donut-card .donut-chart {
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+
+    .chart-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .chart-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+      min-height: 0;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Donut Chart */
+    .donut-chart {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 1;
+      min-height: 180px;
+      max-height: 380px; /* Slight cap for very large screens to maintain proportion */
+    }
+
+    .donut-total {
+      font-size: 38px;
+      font-weight: 800;
+      fill: var(--white);
+      letter-spacing: -1px;
+    }
+
+    .donut-label {
+      font-size: 11px;
+      font-weight: 600;
+      fill: var(--white);
+      opacity: 1; /* Pure white */
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Vertical Screen Optimization (Mobile/Tablet) */
+    @media (max-width: 1300px) {
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .metric-card {
+        aspect-ratio: 2 / 1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 24px;
+        gap: 24px;
+      }
+      .metric-icon {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+      .metric-icon img {
+        width: clamp(40px, 6vw, 56px);
+        height: auto;
+      }
+      .metric-info {
+        align-items: flex-start;
+      }
+      .metric-label { margin-bottom: 4px; }
+      .metric-value { margin-bottom: 4px; }
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      #donut-card, #bar-card {
+        grid-column: span 1;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .metric-card {
+        aspect-ratio: 2 / 1;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      #bar-card {
+        grid-column: span 1;
+      }
+      /* ... rest of mobile styles ... */
+
+      #donut-card {
+        aspect-ratio: auto;
+        min-height: 320px;
+      }
+
+      #donut-card .chart-content {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(20px, 8vw, 80px); /* Larger gap for side-by-side */
+        padding: 20px;
+        width: 100%;
+        height: 100%;
+      }
+
+      #donut-card .donut-chart {
+        flex: 1;
+        max-width: 45%; 
+        max-height: 85%; /* Use more vertical space in row mode */
+        margin: 0;
+      }
+
+      #donut-card .legend {
+        flex: 1;
+        max-width: 45%;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 0;
+        padding-left: 0;
+        gap: clamp(12px, 3vh, 24px);
+      }
+
+      #donut-card .legend {
+        flex: 0 1 auto;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 0;
+        gap: 16px;
+      }
+
+      #bar-card {
+        aspect-ratio: auto;
+        min-height: 450px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #donut-card .chart-content {
+        flex-direction: column;
+        padding: 5px;
+      }
+      
+      #donut-card .donut-chart {
+        width: 100%;
+        max-width: 220px;
+        height: auto;
+      }
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--gray-300);
+      font-weight: 300;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    /* Bar Chart (Horizontal) - Smart Scaling */
+    .bar-chart {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly; /* Better spacing for variable heights */
+      gap: 12px;
+      width: 100%;
+      height: 100%;
+      padding: 15px 0;
+      flex: 1;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      flex: 1; /* Allow rows to grow slightly */
+      min-height: 24px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .bar-label {
+      width: 160px; /* More space for full names */
+      text-align: right;
+      font-size: 13px;
+      color: var(--gray-300);
+      font-weight: 400;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .bar-wrapper {
+      flex: 1;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 7px;
+      position: relative;
+      margin-right: 50px;
+    }
+
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--white) 0%, var(--gray-300) 100%);
+      border-radius: 7px;
+      transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      width: 0; /* Start at 0 for animation */
+    }
+
+    .bar-value {
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    /* Table Filters */
+    .table-header-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .table-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrapper {
+      position: relative;
+      min-width: 250px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 16px 10px 40px;
+      color: var(--white);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.5;
+    }
+
+    .filter-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 16px;
+      color: var(--white);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-select option {
+      background: #1a1a1a;
+    }
+
+    /* Table */
+    .table-card {
+      aspect-ratio: 1 / 1;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Scroll moved to wrapper */
+    }
+
+    /* Custom scrollbar for table-wrapper */
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: transparent;
+      margin: 10px 0;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+      background-clip: content-box;
+    }
+
+    .table-wrapper {
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1; /* Take all remaining vertical space */
+      padding-right: 4px;
+      margin-right: -4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--white);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--gray-300);
+      font-weight: 300;
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar {
+      width: 100px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--white) 0%, var(--gray-300) 100%);
+      transition: width 0.3s;
+    }
+
+    .toggle-text {
+      display: none;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-left: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-card {
+        aspect-ratio: 16 / 9;
+      }
+      .table-card {
+        aspect-ratio: 1 / 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 40px;
+      }
+
+      header.header-hidden .container {
+        padding: 0 40px;
+      }
+
+      /* Section 1: Metrics - 2 columns, square cards (1:1) */
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .metric-card {
+        aspect-ratio: 1 / 1; /* Square cards */
+        padding: 20px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .metric-icon {
+        margin-bottom: 12px;
+      }
+
+      .metric-icon img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .metric-info {
+        align-items: center;
+      }
+
+      .metric-label {
+        font-size: 10px;
+        margin-bottom: 8px;
+      }
+
+      .metric-value {
+        font-size: 28px;
+        margin-bottom: 6px;
+      }
+
+      .metric-trend {
+        font-size: 10px;
+      }
+
+      .logo-text h1 {
+        font-size: 16px;
+      }
+
+      /* Section 2: Charts - Vertical 2:1 aspect ratio */
+      .chart-card {
+        padding: 24px;
+        aspect-ratio: 1 / 2; /* Vertical 2:1 (height is 2x width) */
+        min-height: unset;
+      }
+
+      /* Section 3: Table - Vertical 2:1 aspect ratio */
+      .table-card {
+        padding: 16px;
+        aspect-ratio: 1 / 2; /* Vertical 2:1 (height is 2x width) */
+        min-height: unset;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+
+      /* Table Header Controls - Compact on Mobile */
+      .table-header-group {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .chart-title {
+        font-size: 16px;
+        margin-bottom: 0;
+      }
+
+      .table-controls {
+        width: 100%;
+        gap: 8px;
+      }
+
+      .search-wrapper {
+        min-width: unset;
+        flex: 1;
+      }
+
+      .search-input {
+        padding: 8px 12px 8px 36px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+
+      .search-icon {
+        left: 12px;
+      }
+
+      .filter-select {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+        flex: 1;
+      }
+
+      /* Table Wrapper - Better Mobile Scroll */
+      .table-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+      }
+
+
+      
+      table {
+        min-width: 600px; /* Force horizontal scroll for readability */
+        font-size: 12px;
+      }
+
+      /* Compact table cells on mobile */
+      th {
+        padding: 10px 8px;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        background: rgba(26, 26, 26, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 10;
+      }
+
+      td {
+        padding: 10px 8px;
+        font-size: 12px;
+      }
+
+      /* Compact status badge */
+      .status-badge {
+        padding: 4px 8px;
+        font-size: 9px;
+        letter-spacing: 0.3px;
+        border-radius: 6px;
+      }
+
+      .progress-bar {
+        width: 60px;
+        height: 6px;
+      }
+
+      .header-actions .last-updated {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .metric-card {
+        aspect-ratio: 1 / 1;
+        padding: 16px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+      }
+
+      .metric-card .metric-info {
+        align-items: center;
+      }
+
+      .metric-icon img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .metric-label { font-size: 9px; margin-bottom: 4px; }
+      .metric-value { font-size: 24px; margin-bottom: 4px; }
+      .metric-trend { font-size: 9px; }
+
+      .chart-card {
+        aspect-ratio: auto;
+        min-height: 350px;
+        padding: 20px;
+      }
+
+      .donut-content {
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .donut-svg-container {
+        width: 180px;
+        height: 180px;
+      }
+
+      .bar-chart-container {
+        height: 220px;
+      }
+
+      .container {
+        padding: 0 16px;
+      }
+    }
+
+    /* Side Navigation Dots - Simple & Small */
+    .side-nav {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 2000;
+    }
+
+    /* Hide side nav on mobile */
+    @media (max-width: 768px) {
+      .side-nav {
+        display: none !important;
+      }
+    }
+
+    .nav-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      outline: none;
+      border: none;
+    }
+
+    .nav-dot.active {
+      background: #ffffff;
+      transform: scale(1.5);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    .nav-dot:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="tech-background">
+    <video id="bg-video" autoplay muted loop playsinline></video>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Side Navigation -->
+  <div class="side-nav" id="side-nav"></div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Header -->
+    <header>
+      <div class="container header-content">
+        <div class="logo">
+          <!-- B&W Logo -->
+          <svg class="logo-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="12" fill="white" opacity="0.2"/>
+            <path d="M12 34V20L18 16L24 24L30 14L36 18V34H12Z" fill="white" opacity="0.8"/>
+            <circle cx="18" cy="16" r="2.5" fill="#ffffff"/>
+            <circle cx="24" cy="24" r="2.5" fill="#cccccc"/>
+            <circle cx="30" cy="14" r="2.5" fill="#999999"/>
+            <circle cx="36" cy="18" r="2.5" fill="#cccccc"/>
+          </svg>
+          <div class="logo-text">
+            <h1>SKLUM<img id="heart-settings-btn" src="icons8-heart.apng" alt="heart" style="width: 22px; height: 22px; vertical-align: baseline; position: relative; top: 2px; margin-left: 6px; filter: brightness(0) invert(1); cursor: pointer; transition: all 0.3s ease;"></h1>
+            <span id="header-sheet-name">Loading...</span>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <div class="media-group">
+            <button class="nav-btn prev-media" title="Previous Background">
+              <img src="https://img.icons8.com/liquid-glass/96/back.png" width="20" height="20" alt="Prev">
+              <span class="toggle-text">PREV</span>
+            </button>
+            
+            <button class="media-toggle">
+              <img src="https://img.icons8.com/liquid-glass/96/play.png" 
+                   onerror="this.src='https://img.icons8.com/fluency/96/play.png'" 
+                   alt="Toggle Media" width="24" height="24">
+              <span class="toggle-text">VIDEO</span>
+            </button>
+
+            <button class="nav-btn next-media" title="Next Background">
+              <img src="https://img.icons8.com/liquid-glass/96/forward.png" width="20" height="20" alt="Next">
+              <span class="toggle-text">NEXT</span>
+            </button>
+          </div>
+          <button class="dark-toggle">
+            <img src="https://img.icons8.com/liquid-glass/96/sun.png" 
+                 onerror="this.src='https://img.icons8.com/fluency/96/sun.png'" 
+                 alt="Toggle Theme" width="24" height="24">
+            <span class="toggle-text">LIGHT</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main>
+      <div class="container">
+        <!-- Metric Cards -->
+        <section class="section">
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/bar-chart.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/bar-chart.png'" 
+                     alt="All Tasks" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">All Tasks</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 new</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/task-completed.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/checked.png'" 
+                     alt="Completed" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Completed</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 finished</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/in-progress.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/synchronize.png'" 
+                     alt="In Progress" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">In Progress</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 active</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/search.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/search.png'" 
+                     alt="Ready for Review" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Ready for Review</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 check</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/todo-list.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/todo-list.png'" 
+                     alt="Not Started" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Not Started</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 todo</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/comments.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/comments.png'" 
+                     alt="Feedback" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Feedback</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 feedback</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="section">
+          <div class="charts-grid">
+            <!-- Donut Chart -->
+            <div class="chart-card" id="donut-card">
+              <h3 class="chart-title">Task Status Distribution</h3>
+              <div class="chart-content">
+                <svg class="donut-chart" viewBox="0 0 200 200">
+                  <defs>
+                    <linearGradient id="grad-done" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#cccccc;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="grad-progress" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#cccccc;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#999999;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="grad-todo" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#999999;stop-opacity:0.7" />
+                      <stop offset="100%" style="stop-color:#666666;stop-opacity:0.7" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="url(#grad-done)" stroke-width="35" 
+                          stroke-dasharray="295 440" transform="rotate(-90 100 100)"/>
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="url(#grad-progress)" stroke-width="35" 
+                          stroke-dasharray="97 440" stroke-dashoffset="-295" transform="rotate(-90 100 100)"/>
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="url(#grad-todo)" stroke-width="35" 
+                          stroke-dasharray="48 440" stroke-dashoffset="-392" transform="rotate(-90 100 100)"/>
+                  <text x="100" y="105" text-anchor="middle" class="donut-total">0</text>
+                  <text x="100" y="128" text-anchor="middle" class="donut-label">Total</text>
+                </svg>
+                <div class="legend">
+                  <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #ffffff, #cccccc);"></div>
+                    <span>Done (98)</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #cccccc, #999999);"></div>
+                    <span>In Progress (32)</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #999999, #666666);"></div>
+                    <span>To Do (15)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="chart-card" id="bar-card">
+              <h3 class="chart-title">Tasks by Modeler</h3>
+              <div class="chart-content">
+                <div class="bar-chart">
+                  <div class="bar" style="height: 66%;">
+                    <div class="bar-value">45</div>
+                    <div class="bar-label">Planning</div>
+                  </div>
+                  <div class="bar" style="height: 47%;">
+                    <div class="bar-value">32</div>
+                    <div class="bar-label">Design</div>
+                  </div>
+                  <div class="bar" style="height: 100%;">
+                    <div class="bar-value">68</div>
+                    <div class="bar-label">Dev</div>
+                  </div>
+                  <div class="bar" style="height: 34%;">
+                    <div class="bar-value">23</div>
+                    <div class="bar-label">Testing</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Table -->
+        <section class="section">
+          <div class="table-card">
+            <div class="table-header-group">
+                <h3 class="chart-title" style="margin-bottom: 0;">All Tasks</h3>
+                <div class="table-controls">
+                    <div class="search-wrapper">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="table-search" class="search-input" placeholder="Search MODEL ID, Assignee...">
+                    </div>
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="in progress">In Progress</option>
+                        <option value="ready for review">Ready for Review</option>
+                        <option value="not started">Not Started</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>MODEL ID</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Assignee</th>
+                    <th>Due Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Content populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+<script>
+// Side Navigation Logic
+function initSideNav() {
+  const sections = document.querySelectorAll('section.section');
+  const sideNav = document.getElementById('side-nav');
+  if(!sideNav || sections.length === 0) return;
+
+  sections.forEach((section, index) => {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (index === 0 ? ' active' : '');
+    dot.addEventListener('click', () => {
+      section.scrollIntoView({ behavior: 'smooth' });
+    });
+    sideNav.appendChild(dot);
+  });
+
+  // Observe scrolling to update active dot
+  const observerOptions = {
+    root: null,
+    rootMargin: '-50% 0px -50% 0px', // Trigger when section hits middle
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const index = Array.from(sections).indexOf(entry.target);
+        const dots = document.querySelectorAll('.nav-dot');
+        dots.forEach(dot => dot.classList.remove('active'));
+        if(dots[index]) dots[index].classList.add('active');
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(section => observer.observe(section));
+}
+
+// Global initialization
+window.addEventListener('load', () => {
+    initSideNav();
+});
+
+// Video & Image Background System
+const videos = [
+  // Verified Pixabay Nature Loops (High Reliability)
+  'https://cdn.pixabay.com/video/2024/12/04/244839_large.mp4',       // Dark Waves
+  'https://cdn.pixabay.com/video/2021/09/11/88207-602915574_large.mp4',  // Sunset Clouds
+  'https://cdn.pixabay.com/video/2020/04/24/37088-413229662_large.mp4',  // Tropical Waterfall
+  'https://cdn.pixabay.com/video/2023/11/12/188778-883818276_large.mp4', // Winter Snow
+  'https://cdn.pixabay.com/video/2019/03/18/22070-325253460_large.mp4',  // Storm Clouds
+  
+  // New Drone/Flycam Nature Videos
+  'https://cdn.pixabay.com/video/2026/01/19/328740_large.mp4',       // Alps Sunrise Fog (Drone)
+  'https://cdn.pixabay.com/video/2023/04/30/161071-822582138_large.mp4', // Forest River Aerial
+  'https://cdn.pixabay.com/video/2018/01/10/13772-251867974_large.mp4',  // Surfer Coast (Drone)
+  'https://cdn.pixabay.com/video/2024/06/10/216058_large.mp4',       // Coastal Nature (Drone)
+  'https://cdn.pixabay.com/video/2023/04/28/160767-822213540_large.mp4', // Ocean Beach Waves (Drone)
+  'https://cdn.pixabay.com/video/2026/01/02/325502_large.mp4',       // Winter Snow Nature (Drone)
+
+  // Pexels Selection (Previous)
+  'https://videos.pexels.com/video-files/1409899/1409899-hd_1920_1080_25fps.mp4',
+];
+
+const backups = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
+  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80',
+  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80',
+  'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1920&q=80',
+  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80'
+];
+
+const videoElement = document.getElementById('bg-video');
+const techBg = document.querySelector('.tech-background');
+
+// 1. Set fallback image immediately
+const randomImg = backups[Math.floor(Math.random() * backups.length)];
+techBg.style.backgroundImage = `url('${randomImg}')`;
+
+// 2. Attempt to load video
+const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+videoElement.src = randomVideo;
+
+videoElement.addEventListener('playing', () => {
+  videoElement.classList.add('loaded');
+});
+
+// 3. Fallback handle
+videoElement.onerror = () => {
+  console.log('Video failed to load, keeping image background.');
+  videoElement.style.display = 'none';
+};
+
+// Dark Toggle Functionality
+const darkToggle = document.querySelector('.dark-toggle');
+const toggleIcon = darkToggle.querySelector('img');
+
+// Load saved state
+const isDarkened = localStorage.getItem('background-darkened') === 'true';
+const toggleText = darkToggle.querySelector('.toggle-text');
+
+if (isDarkened) {
+  techBg.classList.add('darkened');
+  toggleIcon.src = 'https://img.icons8.com/liquid-glass/96/moon-symbol.png';
+  toggleIcon.onerror = () => toggleIcon.src = 'https://img.icons8.com/fluency/96/moon-symbol.png';
+  toggleText.textContent = 'DARK';
+}
+
+// Toggle darkness on click
+darkToggle.addEventListener('click', () => {
+  const isCurrentlyDark = techBg.classList.toggle('darkened');
+  
+  // Save state
+  localStorage.setItem('background-darkened', isCurrentlyDark);
+  
+  // Change icon and text
+  if (isCurrentlyDark) {
+    toggleIcon.src = 'https://img.icons8.com/liquid-glass/96/moon-symbol.png';
+    toggleIcon.onerror = () => toggleIcon.src = 'https://img.icons8.com/fluency/96/moon-symbol.png';
+    toggleText.textContent = 'DARK';
+  } else {
+    toggleIcon.src = 'https://img.icons8.com/liquid-glass/96/sun.png';
+    toggleIcon.onerror = () => toggleIcon.src = 'https://img.icons8.com/fluency/96/sun.png';
+    toggleText.textContent = 'LIGHT';
+  }
+});
+
+// Media Toggle Functionality
+const mediaToggle = document.querySelector('.media-toggle');
+const mediaIcon = mediaToggle.querySelector('img');
+const mediaText = mediaToggle.querySelector('.toggle-text');
+let isVideoPlaying = true;
+
+mediaToggle.addEventListener('click', () => {
+  if (isVideoPlaying) {
+    // Pause Video (Show Image)
+    videoElement.style.opacity = '0';
+    setTimeout(() => {
+      if(videoElement.style.opacity === '0') videoElement.pause();
+    }, 1500); // Stop after fade out
+    
+    mediaIcon.src = 'https://img.icons8.com/liquid-glass/96/image.png';
+    mediaIcon.onerror = () => mediaIcon.src = 'https://img.icons8.com/fluency/96/image.png';
+    mediaText.textContent = 'IMAGE';
+    isVideoPlaying = false;
+  } else {
+    // Play Video
+    videoElement.play();
+    videoElement.style.opacity = '1';
+    
+    mediaIcon.src = 'https://img.icons8.com/liquid-glass/96/play.png';
+    mediaIcon.onerror = () => mediaIcon.src = 'https://img.icons8.com/fluency/96/play.png';
+    mediaText.textContent = 'VIDEO';
+    isVideoPlaying = true;
+  }
+});
+
+// Next/Previous Media Functionality
+const prevBtn = document.querySelector('.prev-media');
+const nextBtn = document.querySelector('.next-media');
+let currentVideoIndex = Math.floor(Math.random() * videos.length);
+let currentImageIndex = Math.floor(Math.random() * backups.length);
+
+function updateMedia(direction) {
+  // Fade out current media
+  videoElement.style.opacity = '0';
+  
+  setTimeout(() => {
+    if (isVideoPlaying) {
+      // Update Video
+      if (direction === 'next') {
+        currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+      } else {
+        currentVideoIndex = (currentVideoIndex - 1 + videos.length) % videos.length;
+      }
+      videoElement.src = videos[currentVideoIndex];
+      videoElement.play();
+    } else {
+      // Update Image
+      if (direction === 'next') {
+        currentImageIndex = (currentImageIndex + 1) % backups.length;
+      } else {
+        currentImageIndex = (currentImageIndex - 1 + backups.length) % backups.length;
+      }
+      techBg.style.backgroundImage = `url('${backups[currentImageIndex]}')`;
+    }
+    
+    // Fade in new media
+    setTimeout(() => {
+      videoElement.style.opacity = isVideoPlaying ? '1' : '0';
+    }, 100);
+  }, 500); // Wait for fade out
+}
+
+prevBtn.addEventListener('click', () => updateMedia('prev'));
+nextBtn.addEventListener('click', () => updateMedia('next'));
+
+// Auto-hide Header on Scroll
+const header = document.querySelector('header');
+let lastScrollTop = 0;
+let scrollThreshold = 100; // Start hiding after 100px scroll
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  
+  // Only show normal header at the absolute top of the page
+  if (scrollTop <= 0) {
+    header.classList.remove('header-hidden');
+  } else {
+    header.classList.add('header-hidden');
+  }
+  
+  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+}, false);
+
+// --- NEW: Google Sheets Data Integration ---
+async function initDashboard() {
+  try {
+    const res = await fetch(`/api/data?t=${Date.now()}`);
+    const responseData = await res.json();
+    console.log('Fetched API Response:', responseData);
+    
+    if(!responseData || !Array.isArray(responseData.data)) return;
+
+    const tasks = responseData.data;
+    const metadata = responseData.metadata;
+
+    // Update 'Last Updated' timestamp and Sheet Name in header
+    const lastUpdatedEl = document.querySelector('.last-updated span:last-child');
+    const sheetNameEl = document.getElementById('header-sheet-name');
+    const sheetInput = document.getElementById('sheet-id-input');
+    
+    // Auto-fill Sheet ID from server metadata
+    if (sheetInput && metadata.sheetId) {
+        sheetInput.value = metadata.sheetId;
+    }
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false 
+    });
+    
+    if(lastUpdatedEl && metadata.updatedAt) {
+        lastUpdatedEl.textContent = `Live • Updated at ${timeStr}`;
+    }
+    if(sheetNameEl && metadata.spreadsheet) {
+        sheetNameEl.textContent = metadata.spreadsheet;
+    }
+
+    // Process Data
+    const summary = {
+      total: tasks.length,
+      hoanThanh: 0,
+      dangThucHien: 0,
+      sanSangCheck: 0,
+      chuaBatDau: 0,
+      feedback: 0
+    };
+
+    const normalizedTasks = tasks.map((t, idx) => {
+      const task = {
+        name: t.model_id || t.sku || t.collection || t.task_name || 'Untitled',
+        status: (t.col_j || t.trang_thai || t.status || t.state || 'Unknown').trim(),
+        feedback_status: (t.col_q || t.giai_doan_feedback || t.feedback || t.phan_hoi || '').trim(),
+        progress: t.progress || t.tien_do || t.percent || '0%',
+        assignee: t.modeler || t.assignee || t.nguoi_thuc_hien || 'Unassigned',
+        date: (t.col_r || t.ngay_accepted || t.ngay_gui_l1 || t.due_date || 'TBD').trim()
+      };
+
+      // Map Status to English for Display
+      const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+      
+      if (s.includes('hoan thanh')) {
+          summary.hoanThanh++;
+          task.status = 'Completed';
+      } else if (s.includes('dang thuc hien')) {
+          summary.dangThucHien++;
+          task.status = 'In Progress';
+      } else if (s.includes('san sang check')) {
+          summary.sanSangCheck++;
+          task.status = 'Ready for Review';
+      } else if (s.includes('chua bat dau')) {
+          summary.chuaBatDau++;
+          task.status = 'Not Started';
+      }
+
+      // Map Column Q (Feedback) - Checking for any value that might indicate feedback
+      // if column name contains feedback, we use it directly.
+      // Searching all keys for 'feedback' or 'phan_hoi' if we haven't found it yet.
+      let hasFeedback = false;
+      const f = task.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+      if (f === 'feedback') {
+        hasFeedback = true;
+      }
+
+      if (hasFeedback) summary.feedback++;
+      
+      return task;
+    });
+
+    // Update Metrics
+    const metricValues = document.querySelectorAll('.metric-value');
+    const metricTrends = document.querySelectorAll('.metric-trend');
+    
+    // Trend Calculation: Simple Math (Current - Vercel Baseline)
+    const bl = metadata.baselines || { 
+        total: 0, hoanThanh: 0, dangThucHien: 0, 
+        sanSangCheck: 0, chuaBatDau: 0, feedback: 0 
+    };
+
+    const trends = {
+        total: summary.total - bl.total,
+        hoanThanh: summary.hoanThanh - bl.hoanThanh,
+        dangThucHien: summary.dangThucHien - bl.dangThucHien,
+        sanSangCheck: summary.sanSangCheck - bl.sanSangCheck,
+        chuaBatDau: summary.chuaBatDau - bl.chuaBatDau,
+        feedback: summary.feedback - bl.feedback
+    };
+
+    // Animation Helper
+    function animateValue(obj, start, end, duration) {
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.textContent = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    if(metricValues[0]) animateValue(metricValues[0], 0, summary.total, 1000);
+    if(metricTrends[0]) metricTrends[0].textContent = `${trends.total >= 0 ? '+' : ''}${trends.total} entries`;
+
+    if(metricValues[1]) animateValue(metricValues[1], 0, summary.hoanThanh, 1000);
+    if(metricTrends[1]) metricTrends[1].textContent = `${trends.hoanThanh >= 0 ? '+' : ''}${trends.hoanThanh} finished`;
+
+    if(metricValues[2]) animateValue(metricValues[2], 0, summary.dangThucHien, 1000);
+    if(metricTrends[2]) metricTrends[2].textContent = `${trends.dangThucHien >= 0 ? '+' : ''}${trends.dangThucHien} active`;
+
+    if(metricValues[3]) animateValue(metricValues[3], 0, summary.sanSangCheck, 1000);
+    if(metricTrends[3]) metricTrends[3].textContent = `${trends.sanSangCheck >= 0 ? '+' : ''}${trends.sanSangCheck} check`;
+
+    if(metricValues[4]) animateValue(metricValues[4], 0, summary.chuaBatDau, 1000);
+    if(metricTrends[4]) metricTrends[4].textContent = `${trends.chuaBatDau >= 0 ? '+' : ''}${trends.chuaBatDau} todo`;
+
+    if(metricValues[5]) animateValue(metricValues[5], 0, summary.feedback, 1000);
+    if(metricTrends[5]) metricTrends[5].textContent = `${trends.feedback >= 0 ? '+' : ''}${trends.feedback} feedback`;
+
+    // Helper to render table
+    function renderTable(data) {
+        const tbody = document.querySelector('.table-wrapper tbody');
+        if(!tbody) return;
+        tbody.innerHTML = ''; 
+
+        data.forEach(task => {
+            const tr = document.createElement('tr');
+            let progress = task.progress || '0%';
+            if(!progress.includes('%')) progress += '%';
+
+            tr.innerHTML = `
+              <td>${task.name}</td>
+              <td><span class="status-badge">${task.status}</span></td>
+              <td>
+                 <div class="progress-bar">
+                   <div class="progress-fill" style="width: ${progress};"></div>
+                 </div>
+              </td>
+              <td>${task.assignee}</td>
+              <td>${task.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Initial Render
+    renderTable(normalizedTasks);
+
+    // Update Donut Chart Legend & SVG
+    const legendItems = document.querySelectorAll('.legend-item span');
+    const donutCircles = document.querySelectorAll('.donut-chart circle');
+    const circumference = 440; // 2 * PI * 70
+    const todo = summary.chuaBatDau;
+
+    if(legendItems.length >= 3 && summary.total > 0) {
+        const donePct = ((summary.hoanThanh / summary.total) * 100).toFixed(1);
+        const progPct = (((summary.dangThucHien + summary.sanSangCheck) / summary.total) * 100).toFixed(1);
+        const waitPct = ((summary.chuaBatDau / summary.total) * 100).toFixed(1);
+
+        legendItems[0].textContent = `Done (${donePct}%)`;
+        legendItems[1].textContent = `In Progress (${progPct}%)`;
+        legendItems[2].textContent = `To Do (${waitPct}%)`;
+    }
+
+    if(donutCircles.length >= 3 && summary.total > 0) {
+        const doneLen = (summary.hoanThanh / summary.total) * circumference;
+        const progLen = ((summary.dangThucHien + summary.sanSangCheck) / summary.total) * circumference;
+        const waitLen = (summary.chuaBatDau / summary.total) * circumference;
+
+        // Reset and Apply
+        donutCircles[0].setAttribute('stroke-dasharray', `${doneLen} ${circumference}`);
+        
+        donutCircles[1].setAttribute('stroke-dasharray', `${progLen} ${circumference}`);
+        donutCircles[1].setAttribute('stroke-dashoffset', -doneLen);
+
+        donutCircles[2].setAttribute('stroke-dasharray', `${waitLen} ${circumference}`);
+        donutCircles[2].setAttribute('stroke-dashoffset', -(doneLen + progLen));
+    }
+
+    // Update Donut Total Text - Now showing Progress % and Total count
+    const donutTotal = document.querySelector('.donut-total');
+    const donutLabel = document.querySelector('.donut-label');
+    if(donutTotal && summary.total > 0) {
+        const totalDonePct = Math.round((summary.hoanThanh / summary.total) * 100);
+        donutTotal.textContent = `${totalDonePct}%`;
+    }
+    if(donutLabel) {
+        donutLabel.textContent = `${summary.total} Total`;
+    }
+    
+    // Update Bar Chart (Tasks by Modeler - Column I)
+    const barChart = document.querySelector('.bar-chart');
+    if(barChart) {
+        // Count tasks per Modeler
+        const modelerCounts = {};
+        normalizedTasks.forEach(t => {
+            const m = (t.assignee || '').trim();
+            if (m && m !== 'Unassigned') {
+                modelerCounts[m] = (modelerCounts[m] || 0) + 1;
+            }
+        });
+
+        // Convert to array and sort by count
+        const sortedModelers = Object.entries(modelerCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 12); // Show top 12 to fill the wide 3:2 layout
+
+        const maxCount = Math.max(...sortedModelers.map(m => m[1]), 1);
+        
+        barChart.innerHTML = '';
+        sortedModelers.forEach(([name, count]) => {
+            const width = (count / maxCount) * 100;
+            const row = document.createElement('div');
+            row.className = 'bar-row';
+            row.innerHTML = `
+                <div class="bar-label">${name}</div>
+                <div class="bar-wrapper">
+                    <div class="bar" style="width: ${Math.max(width, 2)}%">
+                        <div class="bar-value">${count}</div>
+                    </div>
+                </div>
+            `;
+            barChart.appendChild(row);
+        });
+    }
+
+    // --- APPLY FILTERS ---
+    const searchInput = document.getElementById('table-search');
+    const statusFilter = document.getElementById('status-filter');
+
+    function applyFilters() {
+        if(!searchInput || !statusFilter) return;
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+
+        const filtered = normalizedTasks.filter(t => {
+            const matchesSearch = t.name.toLowerCase().includes(searchTerm) || 
+                                 t.assignee.toLowerCase().includes(searchTerm);
+            
+            const matchesStatus = statusValue === 'all' || 
+                                 t.status.toLowerCase().includes(statusValue);
+            
+            return matchesSearch && matchesStatus;
+        });
+
+        renderTable(filtered);
+    }
+
+    if(searchInput) searchInput.addEventListener('input', applyFilters);
+    if(statusFilter) statusFilter.addEventListener('change', applyFilters);
+
+  } catch (err) {
+    console.error('Error init dashboard:', err);
+  }
+}
+
+// Check if we are running via http/https (fetched via server) before calling API
+if(window.location.protocol.startsWith('http')) {
+    // Initial load
+    initDashboard();
+    
+    // ========================================
+    // AUTO-RELOAD FUNCTIONALITY
+    // ========================================
+    
+    const REFRESH_INTERVAL = 60000; // 60 seconds (1 minute)
+    let refreshTimer = null;
+    
+    // Function to start auto-refresh
+    function startAutoRefresh() {
+        if (refreshTimer) clearInterval(refreshTimer);
+        
+        refreshTimer = setInterval(() => {
+            if (!document.hidden) {
+                const now = new Date().toLocaleTimeString();
+                console.log(`🔄 Auto-refreshing dashboard at ${now}...`);
+                initDashboard();
+            } else {
+                console.log('⏸️ Tab hidden - skipping refresh');
+            }
+        }, REFRESH_INTERVAL);
+        
+        console.log(`✅ Auto-refresh enabled (every ${REFRESH_INTERVAL/1000} seconds)`);
+    }
+    
+    // Handle visibility changes
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            // Tab became visible - refresh immediately
+            const now = new Date().toLocaleTimeString();
+            console.log(`👁️ Tab visible at ${now} - refreshing data...`);
+            initDashboard();
+            
+            // Restart auto-refresh timer
+            startAutoRefresh();
+        } else {
+            // Tab hidden - stop polling to save resources
+            console.log('🌙 Tab hidden - pausing auto-refresh');
+            if (refreshTimer) clearInterval(refreshTimer);
+        }
+    });
+    
+    // Start auto-refresh
+    startAutoRefresh();
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (refreshTimer) clearInterval(refreshTimer);
+    });
+
+} else {
+    console.warn('Running locally via file://, API fetch will fail. Please run via node server.js');
+}
+
+// --- SETTINGS MODAL FUNCTIONALITY (Global Scope) ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔧 Initializing Settings Modal logic...');
+    
+    const heartBtn = document.getElementById('heart-settings-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const closeModal = document.querySelector('.close-modal');
+    const copyEmailBtn = document.getElementById('copy-email-btn');
+
+    if (!heartBtn) {
+        console.warn('❌ Heart button not found! Check ID "heart-settings-btn"');
+    } else {
+        console.log('✅ Heart button found.');
+    }
+
+    if (!settingsModal) {
+        console.error('❌ Settings modal not found! Check ID "settings-modal"');
+        return;
+    }
+
+    function openSettings() {
+        console.log('📂 Opening Settings Modal...');
+        settingsModal.style.display = 'flex';
+        // Force reflow
+        void settingsModal.offsetWidth;
+        settingsModal.classList.add('active');
+    }
+
+    function closeSettings() {
+        console.log('BX Closing Settings Modal...');
+        settingsModal.classList.remove('active');
+        setTimeout(() => {
+            settingsModal.style.display = 'none';
+        }, 300);
+    }
+
+    if (heartBtn) {
+        heartBtn.addEventListener('click', (e) => {
+            console.log('❤️ Heart clicked!');
+            e.stopPropagation();
+            e.preventDefault(); 
+            openSettings();
+        });
+    }
+
+    if (closeModal) {
+        closeModal.addEventListener('click', closeSettings);
+    }
+
+    // Close on background click
+    if (settingsModal) {
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                closeSettings();
+            }
+        });
+    }
+
+    // Copy Email Function
+    if (copyEmailBtn) {
+        copyEmailBtn.addEventListener('click', () => {
+            const email = 'dashboard-reader@divine-glazing-451115-a0.iam.gserviceaccount.com';
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email).then(() => {
+                    showCopiedFeedback();
+                }).catch(err => {
+                    console.error('Clipboard failed:', err);
+                    prompt('Copy this email:', email);
+                });
+            } else {
+                prompt('Copy this email:', email);
+            }
+        });
+    }
+
+    function showCopiedFeedback() {
+        const originalText = copyEmailBtn.textContent;
+        copyEmailBtn.textContent = 'Copied!';
+        copyEmailBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+        
+        setTimeout(() => {
+            copyEmailBtn.textContent = originalText;
+            copyEmailBtn.style.background = '';
+        }, 2000);
+    }
+
+    // Save Config Function
+    const saveBtn = document.getElementById('save-config-btn');
+    const sheetInput = document.getElementById('sheet-id-input');
+    const statusMsg = document.getElementById('save-status-msg');
+
+    if (saveBtn && sheetInput) {
+        saveBtn.addEventListener('click', async () => {
+            const sheetId = sheetInput.value.trim();
+            if (!sheetId) {
+                statusMsg.textContent = '⚠️ Please enter a Sheet ID';
+                statusMsg.style.color = '#ff6b6b';
+                return;
+            }
+
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/save-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sheetId })
+                });
+
+                if (res.ok) {
+                    statusMsg.textContent = '✅ Saved to localstorage.json! Reloading...';
+                    statusMsg.style.color = '#51cf66';
+                    setTimeout(() => {
+                         window.location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error('Server returned error');
+                }
+            } catch (err) {
+                console.error(err);
+                statusMsg.textContent = '❌ Failed to save. Check console.';
+                statusMsg.style.color = '#ff6b6b';
+                saveBtn.textContent = 'Save';
+                saveBtn.disabled = false;
+            }
+        });
+    }
+
+    // Reset Trends Baseline Logic
+    const resetTrendsBtn = document.getElementById('reset-trends-btn');
+    if (resetTrendsBtn) {
+        resetTrendsBtn.addEventListener('click', () => {
+            if (confirm('Setup current numbers as the new baseline? All trends (+X/-X) will reset to zero.')) {
+                localStorage.removeItem('trend_baselines');
+                resetTrendsBtn.textContent = '✅ Trends Resetting...';
+                resetTrendsBtn.disabled = true;
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
+    }
+
+});
+</script>
+
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-modal">&times;</button>
+        <div class="modal-header">
+            <h2>Dashboard Settings</h2>
+            <p>Configure Google Sheets Connection</p>
+        </div>
+        
+        <div class="modal-body">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <div class="step-info">
+                    <h3>Add Service Account</h3>
+                    <p>Share your Google Sheet with this email address as <strong>Viewer</strong>:</p>
+                    <div class="code-block">
+                        <code>dashboard-reader@divine-glazing-451115-a0.iam.gserviceaccount.com</code>
+                        <button id="copy-email-btn" class="copy-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <div class="step-info">
+                    <h3>Get Sheet ID</h3>
+                    <p>Copy the ID from your Google Sheet URL:</p>
+                    <img src="https://i.imgur.com/8Q6Q2xX.png" alt="Sheet ID Example" class="instruction-img" onerror="this.style.display='none'">
+                    <p class="small-text">Example: /spreadsheets/d/<strong>1XTkvkPZ5pNS...</strong>/edit</p>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <div class="step-info">
+                    <h3>Configure Dashboard</h3>
+                    <p>Paste your Sheet ID below and click Save:</p>
+                    <div class="config-input-group">
+                        <input type="text" id="sheet-id-input" placeholder="Paste Sheet ID here..." class="config-input">
+                        <button id="save-config-btn" class="save-btn">Save</button>
+                    </div>
+                    <p id="save-status-msg" class="small-text" style="margin-top: 8px; min-height: 14px;"></p>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-num">4</div>
+                <div class="step-info">
+                    <h3>Reset Statistics</h3>
+                    <p>Clear current trends and start tracking changes from this moment:</p>
+                    <button id="reset-trends-btn" class="save-btn" style="background: rgba(255, 68, 68, 0.2); color: #ff6b6b; border: 1px solid rgba(255, 68, 68, 0.3); width: 100%;">Reset Trends Baseline</button>
+                    <p class="small-text" style="margin-top: 8px;">Recommended after major sheet cleanups.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <p>Need help? Contact Administrator</p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Heart Button Animation */
+#heart-settings-btn:hover {
+    transform: scale(1.1);
+    opacity: 0.7;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+}
+
+.modal-content {
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 600px;
+    padding: 32px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: var(--white);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: var(--white);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.modal-header h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.modal-header p {
+    color: var(--gray-400);
+    font-size: 14px;
+}
+
+.step-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 16px;
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    background: var(--white);
+    color: var(--black);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.step-info {
+    flex: 1;
+}
+
+.step-info h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.step-info p {
+    font-size: 13px;
+    color: var(--gray-300);
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.code-block {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.code-block code {
+    font-family: monospace;
+    font-size: 12px;
+    color: #a5d6ff;
+    word-break: break-all;
+}
+
+.copy-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 8px;
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.instruction-img {
+    width: 100%;
+    border-radius: 8px;
+    margin: 8px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.small-text {
+    font-size: 11px !important;
+    opacity: 0.7;
+}
+
+.modal-footer {
+    margin-top: 32px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+
+.modal-footer p {
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 24px;
+        width: 95%;
+    }
+    
+    .code-block {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .copy-btn {
+        margin-left: 0;
+        text-align: center;
+    }
+
+    .config-input-group {
+        flex-direction: column;
+    }
+
+    .save-btn {
+        width: 100%;
+    }
+}
+
+.config-input-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.config-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.config-input:focus {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.save-btn {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.save-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.save-btn:active {
+    transform: translateY(1px);
+}
+
+.save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+</style>
+</html>

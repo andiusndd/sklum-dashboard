@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Reload Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .log {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+        .timestamp {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        h1 { color: #4CAF50; }
+        .info { color: #2196F3; }
+        .success { color: #4CAF50; }
+        .warning { color: #FF9800; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Auto-Reload Functionality Test</h1>
+    
+    <div class="status">
+        <h2>Status</h2>
+        <p><strong>Auto-Refresh Interval:</strong> <span id="interval">60</span> seconds</p>
+        <p><strong>Last Refresh:</strong> <span id="last-refresh" class="timestamp">Never</span></p>
+        <p><strong>Next Refresh In:</strong> <span id="countdown" class="timestamp">60</span> seconds</p>
+        <p><strong>Tab Visibility:</strong> <span id="visibility" class="success">Visible</span></p>
+        <p><strong>Refresh Count:</strong> <span id="refresh-count" class="info">0</span></p>
+    </div>
+
+    <div class="log">
+        <div id="console-log"></div>
+    </div>
+
+    <script>
+        const REFRESH_INTERVAL = 60000; // 60 seconds
+        let refreshTimer = null;
+        let refreshCount = 0;
+        let countdownTimer = null;
+        let secondsRemaining = 60;
+
+        const logContainer = document.getElementById('console-log');
+        const lastRefreshEl = document.getElementById('last-refresh');
+        const countdownEl = document.getElementById('countdown');
+        const visibilityEl = document.getElementById('visibility');
+        const refreshCountEl = document.getElementById('refresh-count');
+
+        // Logging function
+        function log(message, type = 'info') {
+            const now = new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false 
+            });
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="timestamp">[${now}]</span> <span class="${type}">${message}</span>`;
+            logContainer.insertBefore(entry, logContainer.firstChild);
+            
+            // Keep only last 50 entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Simulate data refresh
+        function refreshData() {
+            refreshCount++;
+            const now = new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false 
+            });
+            
+            lastRefreshEl.textContent = now;
+            refreshCountEl.textContent = refreshCount;
+            secondsRemaining = 60;
+            
+            log(`🔄 Auto-refreshing dashboard at ${now}...`, 'success');
+        }
+
+        // Countdown timer
+        function startCountdown() {
+            if (countdownTimer) clearInterval(countdownTimer);
+            
+            countdownTimer = setInterval(() => {
+                if (!document.hidden) {
+                    secondsRemaining--;
+                    countdownEl.textContent = secondsRemaining;
+                    
+                    if (secondsRemaining <= 0) {
+                        secondsRemaining = 60;
+                    }
+                }
+            }, 1000);
+        }
+
+        // Auto-refresh function
+        function startAutoRefresh() {
+            if (refreshTimer) clearInterval(refreshTimer);
+            
+            refreshTimer = setInterval(() => {
+                if (!document.hidden) {
+                    refreshData();
+                } else {
+                    log('⏸️ Tab hidden - skipping refresh', 'warning');
+                }
+            }, REFRESH_INTERVAL);
+            
+            log(`✅ Auto-refresh enabled (every ${REFRESH_INTERVAL/1000} seconds)`, 'success');
+        }
+
+        // Handle visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                const now = new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false 
+                });
+                
+                visibilityEl.textContent = 'Visible';
+                visibilityEl.className = 'success';
+                
+                log(`👁️ Tab visible at ${now} - refreshing data...`, 'info');
+                refreshData();
+                startAutoRefresh();
+            } else {
+                visibilityEl.textContent = 'Hidden';
+                visibilityEl.className = 'warning';
+                
+                log('🌙 Tab hidden - pausing auto-refresh', 'warning');
+                if (refreshTimer) clearInterval(refreshTimer);
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshTimer) clearInterval(refreshTimer);
+            if (countdownTimer) clearInterval(countdownTimer);
+        });
+
+        // Initialize
+        log('🚀 Initializing auto-reload test page...', 'info');
+        refreshData();
+        startAutoRefresh();
+        startCountdown();
+    </script>
+</body>
+</html>

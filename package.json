@@ -5,7 +5,8 @@
   "description": "Lightweight SKLUM Dashboard using Pure HTML/JS and Node.js proxy for Google Sheets",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "check": "node -e \"require('./server.js'); setTimeout(() => process.exit(0), 1000)\""
   },
   "dependencies": {
     "express": "^5.2.1",

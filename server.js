@@ -34,8 +34,11 @@ const app = require('./api/server.js');
 
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from root directory
-app.use(express.static(__dirname));
+// Serve static files from /public so Vercel can ship them reliably
+const publicDir = path.join(__dirname, 'public');
+if (fs.existsSync(publicDir)) {
+    app.use(express.static(publicDir));
+}
 
 // Fallback to index.html for SPA-style navigation
 app.use((req, res, next) => {
