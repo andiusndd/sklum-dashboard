@@ -2137,10 +2137,11 @@ async function initDashboard() {
                 .slice(0, 12);
         })());
 
-        const maxCount = Math.max(...sortedModelers.map(m => m[1]), 1);
+        const normalizedModelers = sortedModelers.map(item => Array.isArray(item) ? item : [item.name, item.count]);
+        const maxCount = Math.max(...normalizedModelers.map(m => m[1]), 1);
         
         barChart.innerHTML = '';
-        sortedModelers.forEach(([name, count]) => {
+        normalizedModelers.forEach(([name, count]) => {
             const width = (count / maxCount) * 100;
             const row = document.createElement('div');
             row.className = 'bar-row';
