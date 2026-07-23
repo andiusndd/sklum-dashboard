@@ -118,7 +118,7 @@ function calculateSummary(rows) {
 
         if (status.includes('hoan thanh')) summary.hoanThanh++;
         else if (status.includes('dang thuc hien')) summary.dangThucHien++;
-        else if (status.includes('san sang check')) summary.sanSangCheck++;
+        else if (status.includes('ready customer')) summary.sanSangCheck++;
         else if (!status) summary.chuaBatDau++;
 
         if (customer === 'feedback' || feedback === 'feedback') summary.feedback++;
@@ -150,7 +150,7 @@ function buildTaskView(rows) {
 
         if (normalizedStatus.includes('hoan thanh')) status = 'Completed';
         else if (normalizedStatus.includes('dang thuc hien')) status = 'In Progress';
-        else if (normalizedStatus.includes('san sang check')) status = 'Ready for Review';
+        else if (normalizedStatus.includes('ready customer')) status = 'Ready for Customer';
         else if (normalizedStatus.includes('chua bat dau')) status = 'Not Started';
 
         return {

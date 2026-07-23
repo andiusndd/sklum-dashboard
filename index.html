@@ -1553,12 +1553,12 @@
 
             <div class="metric-card">
               <div class="metric-icon">
-                <img src="https://img.icons8.com/liquid-glass/96/search.png" 
+                <img src="https://img.icons8.com/?size=100&id=LTvptsXhcJki&format=png&color=000000" 
                      onerror="this.src='https://img.icons8.com/fluency/96/search.png'" 
-                     alt="Ready for Review" width="48" height="48">
+                     alt="Ready for Customer" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Ready for Review</div>
+                <div class="metric-label">Ready for Customer</div>
                 <div class="metric-value">0</div>
                 <div class="metric-trend">0 check</div>
               </div>
@@ -1681,7 +1681,7 @@
                         <option value="all">All Status</option>
                         <option value="completed">Completed</option>
                         <option value="in progress">In Progress</option>
-                        <option value="ready for review">Ready for Review</option>
+                        <option value="ready for customer">Ready for Customer</option>
                         <option value="not started">Not Started</option>
                     </select>
                 </div>
@@ -1988,9 +1988,9 @@ async function initDashboard() {
       } else if (s.includes('dang thuc hien')) {
           summary.dangThucHien++;
           task.status = 'In Progress';
-      } else if (s.includes('san sang check')) {
+      } else if (s.includes('ready customer')) {
           summary.sanSangCheck++;
-          task.status = 'Ready for Review';
+          task.status = 'Ready for Customer';
       } else if (s.includes('chua bat dau')) {
           summary.chuaBatDau++;
           task.status = 'Not Started';
